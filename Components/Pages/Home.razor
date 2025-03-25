@@ -1,0 +1,96 @@
+﻿
+@page "/"
+@inject ExchangeRatesService ExchangeService
+
+
+<header>
+    <button class="btn btn-toolbar">☰</button>
+    <h1 class="text-center fw-bold">CURRENCY CONVERTER</h1>
+</header>
+
+
+<main>
+    <div class="container">
+        @if (rates != null)
+        {
+            <div class="row align-items-center">
+                <!-- Dropdowns for selecting input and output currencies-->
+                <div class="col d-flex flex-column">
+                    <select value="@chosenIn" @onchange="ChosenInChange">
+                        @foreach (var entry in rates.Rates)
+                        {
+                            <option value="@entry.Key">@entry.Key</option>
+                        }
+                    </select>
+                    <!-- Input amount field with immediate conversion on input-->
+                    <input type="number" @bind="@amount" step="0.01" @bind:event="oninput" @bind:after="Convert" />
+                </div>
+                <div class="col-auto align-self-center">
+                    <button class="btn btn-outline-secondary" @onclick="SwapCurrencies">↔️</button>
+
+                </div>
+                <div class="col d-flex flex-column">
+                    <select value="@chosenOut" @onchange="ChosenOutChange">
+                        @foreach (var entry in rates.Rates)
+                        {
+                            <option value="@entry.Key">@entry.Key</option>
+                        }
+                    </select>
+                    <!-- Display converted result, read-only-->
+                    <input type="number" @bind="@result" step="0.01" readonly />
+                </div>       
+            </div>
+        }
+    </div>
+    <div class="favourites">
+
+        <div class="row-cals-2">
+
+        </div>
+    </div>
+
+</main>
+
+@code
+{
+    private ExchangeRatesResponse? rates;
+
+    // Fetch initial exchange rates and set default currencies
+    protected override async Task OnInitializedAsync()
+    {
+        rates = await ExchangeService.GetRates();
+        chosenIn = "USD";
+        chosenOut = "EUR";
+    }
+    private string chosenIn = "";
+    private string chosenOut = "";
+    private decimal amount = 0.00M;
+    private decimal result = 0.00M;
+
+    // Update currency selection and recalculate conversion
+    private async Task ChosenInChange(ChangeEventArgs e)
+    {
+        chosenIn = e.Value?.ToString() ?? "";
+        await Convert();
+    }
+
+    private async Task ChosenOutChange(ChangeEventArgs e)
+    {
+        chosenOut = e.Value?.ToString() ?? "";
+        await Convert();
+    }
+
+    // Calculate and update the converted amount dynamically
+    private async Task Convert()
+    {
+        await Task.Yield();
+        result = ExchangeService.Convert(amount, chosenIn, chosenOut);
+
+    }
+
+    private async Task SwapCurrencies()
+    {
+        (chosenIn, chosenOut) = (chosenOut, chosenIn);
+        await Convert();
+    }
+}
