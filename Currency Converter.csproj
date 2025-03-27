@@ -66,4 +66,10 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <MauiAsset Update="Resources\Raw\appSettings.json">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </MauiAsset>
+    </ItemGroup>
+
 </Project>

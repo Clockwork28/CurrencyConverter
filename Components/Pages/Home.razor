@@ -63,6 +63,8 @@
     // Fetch initial exchange rates and set default currencies
     protected override async Task OnInitializedAsync()
     {
+        await ExchangeService.InitAsync();
+        await Favourites.InitAsync();
         rates = await ExchangeService.GetRates();
         chosenFrom = "USD";
         chosenTo = "EUR";

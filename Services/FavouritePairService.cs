@@ -18,15 +18,23 @@ namespace Currency_Converter.Services
         public FavouritePairService(ILogger<FavouritePairService> logger)
         {
             _logger = logger;
+        }
 
+        public async Task InitAsync()
+        {
             try
             {
-                var favouritesPath = Path.Combine(Directory.GetCurrentDirectory(), "favourites.json");
-                if (File.Exists(favouritesPath))
+
+                var path = Path.Combine(FileSystem.AppDataDirectory, "favourites.json");
+                if (!File.Exists(path))
                 {
-                    var favourites = File.ReadAllText(favouritesPath);
-                    _logger.LogInformation($"Zawartość favourites.json: {favourites}");
-                    if (!string.IsNullOrEmpty(favourites))
+                    using var stream = await FileSystem.OpenAppPackageFileAsync("favourites.json");
+                    using FileStream outputStream = File.OpenWrite(path);
+                    await stream.CopyToAsync(outputStream);
+                    await outputStream.FlushAsync();
+                }
+                var favourites = await File.ReadAllTextAsync(path);
+                if (!string.IsNullOrEmpty(favourites))
                     {
                         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                         _favPairs = JsonSerializer.Deserialize<List<FavouritePair>>(favourites, options) ?? new();
@@ -36,9 +44,6 @@ namespace Currency_Converter.Services
                             _logger.LogInformation($" - {pair}");
                         }
                     }
-                    
-                }
-
             }
             catch (Exception ex)
             {
@@ -46,7 +51,6 @@ namespace Currency_Converter.Services
                 throw;
             }
         }
-
         public async Task AddFavPair(FavouritePair pair)
         {
             await Task.Yield();
@@ -80,8 +84,8 @@ namespace Currency_Converter.Services
         private void SaveJson()
         {
             var json = JsonSerializer.Serialize(_favPairs, new JsonSerializerOptions { WriteIndented = true });
-            var favouritesPath = Path.Combine(Directory.GetCurrentDirectory(), "favourites.json");
-            File.WriteAllText(favouritesPath, json);
+            var path = Path.Combine(FileSystem.AppDataDirectory, "favourites.json");
+            File.WriteAllText(path, json);
         }
     }
 }

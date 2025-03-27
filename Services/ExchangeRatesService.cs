@@ -14,27 +14,42 @@ namespace Currency_Converter.Services
     /// </summary>
     public class ExchangeRatesService
     {
-        private readonly string? _apiKey;
+        private string? _apiKey;
         private readonly ILogger<ExchangeRatesService> _logger;
         private ExchangeRatesResponse? _rates;
         
         public ExchangeRatesService(ILogger<ExchangeRatesService> logger)
         {
             _logger = logger;
+        }
 
+        public async Task InitAsync()
+        {
             // API requires a key from appSettings.json
             try
             {
-                var appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), "appSettings.json");
-                if (File.Exists(appSettingsPath))
-                {
-                    var appSettings = File.ReadAllText(appSettingsPath);
-                    if (!string.IsNullOrEmpty(appSettings))
-                    {
-                        _apiKey = JsonSerializer.Deserialize<AppSettings>(appSettings)?.ApiKey;
+                var path = Path.Combine(FileSystem.AppDataDirectory, "appSettings.json");
+                _logger.LogInformation($"Looking for appSettings.json in: {FileSystem.AppDataDirectory}");
+                _logger.LogInformation($"File exists? {File.Exists(path)}");
 
-                    }
+                if (File.Exists(path))
+                {
+                    var debugContent = await File.ReadAllTextAsync(path);
+                    _logger.LogInformation($"File content: {debugContent}");
                 }
+                if (!File.Exists(path))
+                {
+                    using var stream = await FileSystem.OpenAppPackageFileAsync("appSettings.json");
+                    using FileStream outputStream = File.OpenWrite(path);
+                    await stream.CopyToAsync(outputStream);
+                    await outputStream.FlushAsync();
+                }
+                var appSettings = await File.ReadAllTextAsync(path);
+                if (!string.IsNullOrEmpty(appSettings))
+                {
+                        _apiKey = JsonSerializer.Deserialize<AppSettings>(appSettings)?.ApiKey;
+                }
+                
 
                 if (string.IsNullOrEmpty(_apiKey))
                 {
