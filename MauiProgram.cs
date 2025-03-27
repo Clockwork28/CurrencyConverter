@@ -17,6 +17,7 @@ namespace Currency_Converter
 
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddSingleton<ExchangeRatesService>();
+            builder.Services.AddSingleton<FavouritePairService>();
             builder.Services.AddLogging();
 
 #if DEBUG

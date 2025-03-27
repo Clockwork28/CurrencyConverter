@@ -1,7 +1,7 @@
 ﻿
 @page "/"
 @inject ExchangeRatesService ExchangeService
-
+@inject FavouritePairService Favourites
 
 <header>
     <button class="btn btn-toolbar">☰</button>
@@ -10,43 +10,48 @@
 
 
 <main>
-    <div class="container">
+    <div class="container align-items-center">
         @if (rates != null)
         {
-            <div class="row align-items-center">
+            <div class="row align-items-center justify-content-center">
                 <!-- Dropdowns for selecting input and output currencies-->
-                <div class="col d-flex flex-column">
-                    <select value="@chosenIn" @onchange="ChosenInChange">
+                <div class="col-auto gap-2 d-flex flex-column">
+                    <select class="form-control w-auto"value="@chosenFrom" @onchange="ChosenFromChange">
                         @foreach (var entry in rates.Rates)
                         {
                             <option value="@entry.Key">@entry.Key</option>
                         }
                     </select>
                     <!-- Input amount field with immediate conversion on input-->
-                    <input type="number" @bind="@amount" step="0.01" @bind:event="oninput" @bind:after="Convert" />
+                    <input class="form-control w-auto"type="number" @bind="@amount" step="0.01" @bind:event="oninput" @bind:after="Convert" />
                 </div>
                 <div class="col-auto align-self-center">
-                    <button class="btn btn-outline-secondary" @onclick="SwapCurrencies">↔️</button>
+                    <button class="btn btn-oval btn-outline-secondary" @onclick="SwapCurrencies">↔️</button>
 
                 </div>
-                <div class="col d-flex flex-column">
-                    <select value="@chosenOut" @onchange="ChosenOutChange">
+                <div class="col-auto gap-2 d-flex flex-column">
+                    <select class="form-control w-auto" value="@chosenTo" @onchange="ChosenToChange">
                         @foreach (var entry in rates.Rates)
                         {
                             <option value="@entry.Key">@entry.Key</option>
                         }
                     </select>
                     <!-- Display converted result, read-only-->
-                    <input type="number" @bind="@result" step="0.01" readonly />
+                    <input class="form-control w-auto" type="number" @bind="@result" step="0.01" readonly />
                 </div>       
             </div>
         }
     </div>
-    <div class="favourites">
+    <div class="container d-flex flex-column align-items-center">
+        <button class="btn btn-outline-secondary" @onclick="AddPair">Add to favourites</button>
+        <button class="btn btn-outline-secondary" @onclick="RemovePair">Remove test</button>
+    </div>
 
-        <div class="row-cals-2">
-
-        </div>
+    <div class="favourites container d-flex flex-column align-items-center">
+        @foreach (var pair in Favourites._favPairs)
+        {
+            <button class="btn btn-outline-secondary" @onclick="() => ApplyFavourite(pair)">@pair</button>
+        }
     </div>
 
 </main>
@@ -59,24 +64,24 @@
     protected override async Task OnInitializedAsync()
     {
         rates = await ExchangeService.GetRates();
-        chosenIn = "USD";
-        chosenOut = "EUR";
+        chosenFrom = "USD";
+        chosenTo = "EUR";
     }
-    private string chosenIn = "";
-    private string chosenOut = "";
+    private string chosenFrom = "";
+    private string chosenTo = "";
     private decimal amount = 0.00M;
     private decimal result = 0.00M;
 
     // Update currency selection and recalculate conversion
-    private async Task ChosenInChange(ChangeEventArgs e)
+    private async Task ChosenFromChange(ChangeEventArgs e)
     {
-        chosenIn = e.Value?.ToString() ?? "";
+        chosenFrom = e.Value?.ToString() ?? "";
         await Convert();
     }
 
-    private async Task ChosenOutChange(ChangeEventArgs e)
+    private async Task ChosenToChange(ChangeEventArgs e)
     {
-        chosenOut = e.Value?.ToString() ?? "";
+        chosenTo = e.Value?.ToString() ?? "";
         await Convert();
     }
 
@@ -84,13 +89,43 @@
     private async Task Convert()
     {
         await Task.Yield();
-        result = ExchangeService.Convert(amount, chosenIn, chosenOut);
+        result = ExchangeService.Convert(amount, chosenFrom, chosenTo);
 
     }
 
     private async Task SwapCurrencies()
     {
-        (chosenIn, chosenOut) = (chosenOut, chosenIn);
+        (chosenFrom, chosenTo) = (chosenTo, chosenFrom);
+        await Convert();
+    }
+
+    private async Task AddPair()
+    {
+        var pair = new FavouritePair
+        { 
+            From = chosenFrom,
+            To = chosenTo
+        };
+
+        if (pair.From != pair.To){}
+            await Favourites.AddFavPair(pair);
+    }
+
+    private async Task RemovePair()
+    {
+        var pair = new FavouritePair
+        {
+                From = chosenFrom,
+                To = chosenTo
+        };
+
+        await Favourites.RemoveFavPair(pair);
+
+    }
+
+    private async Task ApplyFavourite(FavouritePair pair)
+    {
+        (chosenFrom, chosenTo) = (pair.From, pair.To);
         await Convert();
     }
 }
