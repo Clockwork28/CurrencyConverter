@@ -77,6 +77,32 @@ h1:focus {
         content: "An error has occurred."
     }
 
+.offcanvas-custom {
+    width: auto;
+    min-width: 50px;
+    max-width: 100px;
+    height: auto;
+    max-height: 150px;
+    overflow-y: auto;
+    top: 3rem; /* żeby nie nachodziło na pasek */
+    left: 0.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.offcanvas-custom ul{
+    padding-left: 1rem;
+}
+
+.offcanvas-start {
+    transform: translateX(-150%) !important;
+    transition: transform 0.1s ease-in-out;
+}
+
+    .offcanvas-start.show {
+        transform: translateX(0%) !important;
+    }
+
 .status-bar-safe-area {
     display: none;
 }

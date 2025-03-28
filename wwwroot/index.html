@@ -24,6 +24,19 @@
     </div>
 
     <script src="_framework/blazor.webview.js" autostart="false"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+
+    <script>
+                document.addEventListener('click', function (e) {
+                    const offcanvasEl = document.querySelector('.offcanvas.show');
+                    if (offcanvasEl && e.target.classList.contains('nav-link')) {
+                        const bsOffCanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+                        setTimeout(() => {
+                            bsOffCanvas.hide();
+                        }, 50);
+                    }
+                })
+    </script>
 
 </body>
 

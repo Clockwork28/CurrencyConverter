@@ -4,7 +4,6 @@
 @inject FavouritePairService Favourites
 
 <header>
-    <button class="btn btn-toolbar">☰</button>
     <h1 class="text-center fw-bold">CURRENCY CONVERTER</h1>
 </header>
 
@@ -13,9 +12,9 @@
     <div class="container align-items-center">
         @if (rates != null)
         {
-            <div class="row align-items-center justify-content-center">
+            <div class="row align-items-center justify-content-center flex-nowrap gap-2">
                 <!-- Dropdowns for selecting input and output currencies-->
-                <div class="col-auto gap-2 d-flex flex-column">
+                <div class="col-auto gap-2 d-flex flex-column" style="max-width: 40%">
                     <select class="form-control w-auto"value="@chosenFrom" @onchange="ChosenFromChange">
                         @foreach (var entry in rates.Rates)
                         {
@@ -25,11 +24,13 @@
                     <!-- Input amount field with immediate conversion on input-->
                     <input class="form-control w-auto"type="number" @bind="@amount" step="0.01" @bind:event="oninput" @bind:after="Convert" />
                 </div>
-                <div class="col-auto align-self-center">
-                    <button class="btn btn-oval btn-outline-secondary" @onclick="SwapCurrencies">↔️</button>
+                <div class="col-auto d-flex align-content-center justify-content-center" style="max-width: 10%">
+                    <div class="w-auto d-flex justify-content-center">
+                        <button class="btn btn-oval btn-outline-secondary" @onclick="SwapCurrencies">↔️</button>
+                    </div>
 
                 </div>
-                <div class="col-auto gap-2 d-flex flex-column">
+                <div class="col-auto gap-2 d-flex flex-column" style="max-width: 40%">
                     <select class="form-control w-auto" value="@chosenTo" @onchange="ChosenToChange">
                         @foreach (var entry in rates.Rates)
                         {
