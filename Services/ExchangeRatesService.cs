@@ -17,7 +17,11 @@ namespace Currency_Converter.Services
         private string? _apiKey;
         private readonly ILogger<ExchangeRatesService> _logger;
         private ExchangeRatesResponse? _rates;
-        
+        public Dictionary<string, decimal> fiatRates = new Dictionary<string, decimal>();
+        public Dictionary<string, decimal> cryptoRates = new Dictionary<string, decimal>();
+        public Dictionary<string, decimal> otherRates = new Dictionary<string, decimal>();
+
+
         public ExchangeRatesService(ILogger<ExchangeRatesService> logger)
         {
             _logger = logger;
@@ -71,15 +75,14 @@ namespace Currency_Converter.Services
             using var client = new HttpClient();
             try
             {
-                var response = await client.GetAsync($"https://openexchangerates.org/api/latest.json?app_id={_apiKey}");
+                var response = await client.GetAsync($"https://openexchangerates.org/api/latest.json?app_id={_apiKey}&show_alternative=1");
                 response.EnsureSuccessStatusCode();
                 var content = await response.Content.ReadAsStringAsync();
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 _rates = JsonSerializer.Deserialize<ExchangeRatesResponse>(content, options);
+                if (_rates != null)
+                await FilterRates(_rates);
                 return _rates;
-         
-
-
             }
             catch (HttpRequestException httpEx)
             {
@@ -138,6 +141,14 @@ namespace Currency_Converter.Services
                 _logger.LogError($"Unexpected error: {ex.Message}");
                 throw;
             }
+        }
+
+        public async Task FilterRates(ExchangeRatesResponse rates)
+        {
+            await Task.Yield();
+            fiatRates = rates.Rates.Where(c => CurrencyCategories.TopFiatCurrencies.Contains(c.Key)).ToDictionary();
+            cryptoRates = rates.Rates.Where(c => CurrencyCategories.TopCryptocurrencies.Contains(c.Key)).ToDictionary();
+            otherRates = rates.Rates.Except(fiatRates.Union(cryptoRates)).ToDictionary();
         }
     }
 }

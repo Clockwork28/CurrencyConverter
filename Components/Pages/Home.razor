@@ -15,12 +15,26 @@
             <div class="row align-items-center justify-content-center flex-nowrap gap-2">
                 <!-- Dropdowns for selecting input and output currencies-->
                 <div class="col-auto gap-2 d-flex flex-column" style="max-width: 40%">
-                    <select class="form-control w-auto"value="@chosenFrom" @onchange="ChosenFromChange">
-                        @foreach (var entry in rates.Rates)
-                        {
-                            <option value="@entry.Key">@entry.Key</option>
-                        }
-                    </select>
+                        <select class="form-control w-auto" value="@chosenFrom" @onchange="ChosenFromChange">
+                            <optgroup label="Currencies">
+                            @foreach (var entry in ExchangeService.fiatRates)
+                            {
+                                        <option value="@entry.Key">@entry.Key</option>
+                            }
+                            </optgroup>
+                            <optgroup label="Cryptocurencies">
+                            @foreach (var entry in ExchangeService.cryptoRates)
+                            {
+                                        <option value="@entry.Key">@entry.Key</option>
+                            }
+                            </optgroup>
+                            <optgroup label="Other Currencies">
+                            @foreach (var entry in ExchangeService.otherRates)
+                            {
+                                        <option value="@entry.Key">@entry.Key</option>
+                            }
+                            </optgroup>
+                        </select>
                     <!-- Input amount field with immediate conversion on input-->
                     <input class="form-control w-auto"type="number" @bind="@amount" step="0.01" @bind:event="oninput" @bind:after="Convert" />
                 </div>
@@ -32,10 +46,24 @@
                 </div>
                 <div class="col-auto gap-2 d-flex flex-column" style="max-width: 40%">
                     <select class="form-control w-auto" value="@chosenTo" @onchange="ChosenToChange">
-                        @foreach (var entry in rates.Rates)
-                        {
-                            <option value="@entry.Key">@entry.Key</option>
-                        }
+                        <optgroup label="Currencies">
+                            @foreach (var entry in ExchangeService.fiatRates)
+                            {
+                                <option value="@entry.Key">@entry.Key</option>
+                            }
+                        </optgroup>
+                        <optgroup label="Cryptocurencies">
+                            @foreach (var entry in ExchangeService.cryptoRates)
+                            {
+                                <option value="@entry.Key">@entry.Key</option>
+                            }
+                        </optgroup>
+                        <optgroup label="Other Currencies">
+                            @foreach (var entry in ExchangeService.otherRates)
+                            {
+                                <option value="@entry.Key">@entry.Key</option>
+                            }
+                        </optgroup>
                     </select>
                     <!-- Display converted result, read-only-->
                     <input class="form-control w-auto" type="number" @bind="@result" step="0.01" readonly />
@@ -131,4 +159,5 @@
         (chosenFrom, chosenTo) = (pair.From, pair.To);
         await Convert();
     }
+
 }
