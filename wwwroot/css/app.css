@@ -3,6 +3,7 @@ html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+
 a, .btn-link {
     color: #006bb7;
 }
@@ -32,6 +33,7 @@ a, .btn-link {
 }
 
 /*#endif*/
+
 h1:focus {
     outline: none;
 }
@@ -84,7 +86,7 @@ h1:focus {
     height: auto;
     max-height: 150px;
     overflow-y: auto;
-    top: 3rem; /* żeby nie nachodziło na pasek */
+    top: 3rem;
     left: 0.5rem;
     border-radius: 0.5rem;
     box-shadow: 0 0 10px rgba(0,0,0,0.3);

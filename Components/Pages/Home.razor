@@ -2,89 +2,94 @@
 @page "/"
 @inject ExchangeRatesService ExchangeService
 @inject FavouritePairService Favourites
+@using Microsoft.Maui.Controls
 
 <header>
     <h1 class="text-center fw-bold">CURRENCY CONVERTER</h1>
 </header>
 
-
-<main>
-    <div class="container align-items-center">
-        @if (rates != null)
-        {
-            <div class="row align-items-center justify-content-center flex-nowrap gap-2">
-                <!-- Dropdowns for selecting input and output currencies-->
-                <div class="col-auto gap-2 d-flex flex-column" style="max-width: 40%">
+<br />
+    <main>
+        <div class="container align-items-center">
+            @if (rates != null)
+            {
+                <div class="row align-items-center justify-content-center flex-nowrap gap-2">
+                    <!-- Dropdowns for selecting input and output currencies-->
+                    <div class="col-auto gap-2 d-flex flex-column" style="max-width: 40%">
                         <select class="form-control w-auto" value="@chosenFrom" @onchange="ChosenFromChange">
                             <optgroup label="Currencies">
-                            @foreach (var entry in ExchangeService.fiatRates)
-                            {
-                                        <option value="@entry.Key">@entry.Key</option>
-                            }
+                                @foreach (var entry in ExchangeService.fiatRates)
+                                {
+                                    <option value="@entry.Key">@entry.Key</option>
+                                }
                             </optgroup>
                             <optgroup label="Cryptocurencies">
-                            @foreach (var entry in ExchangeService.cryptoRates)
-                            {
-                                        <option value="@entry.Key">@entry.Key</option>
-                            }
+                                @foreach (var entry in ExchangeService.cryptoRates)
+                                {
+                                    <option value="@entry.Key">@entry.Key</option>
+                                }
                             </optgroup>
                             <optgroup label="Other Currencies">
-                            @foreach (var entry in ExchangeService.otherRates)
-                            {
-                                        <option value="@entry.Key">@entry.Key</option>
-                            }
+                                @foreach (var entry in ExchangeService.otherRates)
+                                {
+                                    <option value="@entry.Key">@entry.Key</option>
+                                }
                             </optgroup>
                         </select>
-                    <!-- Input amount field with immediate conversion on input-->
-                    <input class="form-control w-auto"type="number" @bind="@amount" step="0.01" @bind:event="oninput" @bind:after="Convert" />
-                </div>
-                <div class="col-auto d-flex align-content-center justify-content-center" style="max-width: 10%">
-                    <div class="w-auto d-flex justify-content-center">
-                        <button class="btn btn-oval btn-outline-secondary" @onclick="SwapCurrencies">↔️</button>
+                        <!-- Input amount field with immediate conversion on input-->
+                        <input class="form-control w-auto"type="number" @bind="@amount" step="0.01" @bind:event="oninput" @bind:after="Convert" />
                     </div>
+                    <div class="col-auto d-flex align-content-center justify-content-center" style="max-width: 10%">
+                        <div class="w-auto d-flex justify-content-center">
+                            <button class="btn btn-oval btn-outline-secondary" @onclick="SwapCurrencies">↔️</button>
+                        </div>
 
+                    </div>
+                    <div class="col-auto gap-2 d-flex flex-column" style="max-width: 40%">
+                        <select class="form-control w-auto" value="@chosenTo" @onchange="ChosenToChange">
+                            <optgroup label="Currencies">
+                                @foreach (var entry in ExchangeService.fiatRates)
+                                {
+                                    <option value="@entry.Key">@entry.Key</option>
+                                }
+                            </optgroup>
+                            <optgroup label="Cryptocurencies">
+                                @foreach (var entry in ExchangeService.cryptoRates)
+                                {
+                                    <option value="@entry.Key">@entry.Key</option>
+                                }
+                            </optgroup>
+                            <optgroup label="Other Currencies">
+                                @foreach (var entry in ExchangeService.otherRates)
+                                {
+                                    <option value="@entry.Key">@entry.Key</option>
+                                }
+                            </optgroup>
+                        </select>
+                        <!-- Display converted result, read-only-->
+                        <input class="form-control w-auto" type="number" @bind="@result" step="0.01" readonly />
+                    </div>       
                 </div>
-                <div class="col-auto gap-2 d-flex flex-column" style="max-width: 40%">
-                    <select class="form-control w-auto" value="@chosenTo" @onchange="ChosenToChange">
-                        <optgroup label="Currencies">
-                            @foreach (var entry in ExchangeService.fiatRates)
-                            {
-                                <option value="@entry.Key">@entry.Key</option>
-                            }
-                        </optgroup>
-                        <optgroup label="Cryptocurencies">
-                            @foreach (var entry in ExchangeService.cryptoRates)
-                            {
-                                <option value="@entry.Key">@entry.Key</option>
-                            }
-                        </optgroup>
-                        <optgroup label="Other Currencies">
-                            @foreach (var entry in ExchangeService.otherRates)
-                            {
-                                <option value="@entry.Key">@entry.Key</option>
-                            }
-                        </optgroup>
-                    </select>
-                    <!-- Display converted result, read-only-->
-                    <input class="form-control w-auto" type="number" @bind="@result" step="0.01" readonly />
-                </div>       
+            }
+        </div>
+        <br />
+        <div class="row align-items-center justify-content-center flex-nowrap gap-2">
+            <div class="col-auto gap-2 d-flex flex-column" style="max-width: 40%">
+                <button class="btn btn-outline-secondary" @onclick="AddPair">Add to favourites</button>
             </div>
-        }
-    </div>
-    <div class="container d-flex flex-column align-items-center">
-        <button class="btn btn-outline-secondary" @onclick="AddPair">Add to favourites</button>
-        <button class="btn btn-outline-secondary" @onclick="RemovePair">Remove test</button>
-    </div>
+            <div class="col-auto gap-2 d-flex flex-column" style="max-width: 40%">
+                <button class="btn btn-outline-secondary" @onclick="RemovePair">Remove favourite</button>
+            </div>
+        </div>
+        <br />
+    <div class="favourites container d-flex gap-2 flex-column align-items-center">
+            @foreach (var pair in Favourites._favPairs)
+            {
+                <button class="btn btn-outline-secondary" @onclick="() => ApplyFavourite(pair)">@pair</button>
+            }
+        </div>
 
-    <div class="favourites container d-flex flex-column align-items-center">
-        @foreach (var pair in Favourites._favPairs)
-        {
-            <button class="btn btn-outline-secondary" @onclick="() => ApplyFavourite(pair)">@pair</button>
-        }
-    </div>
-
-</main>
-
+    </main>
 @code
 {
     private ExchangeRatesResponse? rates;
@@ -139,7 +144,7 @@
         };
 
         if (pair.From != pair.To){}
-            await Favourites.AddFavPair(pair);
+        await Favourites.AddFavPair(pair);
     }
 
     private async Task RemovePair()
@@ -159,5 +164,4 @@
         (chosenFrom, chosenTo) = (pair.From, pair.To);
         await Convert();
     }
-
 }
