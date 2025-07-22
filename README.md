@@ -8,14 +8,14 @@ Supports favourite currency pairs and works cross-platform.
 
 ## 🚀 Features
 
-- 🌍 **Live currency exchange rates** using [Open Exchange Rates](https://openexchangerates.org/)
-- 🔄 Real-time currency conversion
-- ❤️ Add & remove favourite currency pairs
-- 📱 Mobile-first UI layout (designed with mobile in mind)
-- 📂 Categorized currency selection (Fiat / Crypto / Other)
-- 🧠 Data caching and offline-safe initialization
-- 🧭 Navigation with hamburger menu and About page
-- ☁️ Configuration from `appSettings.json`
+-  **Live currency exchange rates** using [Open Exchange Rates](https://openexchangerates.org/)
+-  Real-time currency conversion
+-  Add & remove favourite currency pairs
+-  Mobile-first UI layout (designed with mobile in mind)
+-  Categorized currency selection (Fiat / Crypto / Other)
+-  Data caching and offline-safe initialization
+-  Navigation with hamburger menu and About page
+-  Configuration from `appSettings.json`
 
 ---
 
