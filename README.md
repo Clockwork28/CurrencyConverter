@@ -31,8 +31,6 @@ Supports favourite currency pairs and works cross-platform.
 
 ## 📦 Setup
 
-> ⚠️ Requires Visual Studio 2022+ with .NET MAUI workload installed.
-
 1. Clone this repo
 2. Place your `appSettings.json` in `Resources/Raw` or use the template:
 ```json
